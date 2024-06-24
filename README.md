@@ -7,9 +7,7 @@
 
 
 ## 스터디원
-|<img src="https://avatars.githubusercontent.com/u/154623483?v=4" width="150" height="150"/>|<img src="https://avatars.githubusercontent.com/u/159243890?v=4" width="150" height="150"/>|<img src="https://avatars.githubusercontent.com/u/142865296?v=4" width="150" height="150"/>|<img src="https://avatars.githubusercontent.com/u/141708445?v=4" width="150" height="150"/>|
-|:-:|:-:|:-:|:-:|
-|Jeongmin<br/>[@oris8](https://github.com/oris8)|[@zmzm12171](https://github.com/zmzm12171)|Hanjeyoung<br/>[@Hanywyam](https://github.com/Hanywyam)|[@Liz-Chung](https://github.com/Liz-Chung)|
+
 <br/>
 
 <br/>
@@ -18,10 +16,7 @@
 
 ## 스터디 일정
 
-~~2024.04.01 ~ 2024.05.26 (약 8주)~~ <br/>
-2024.04.01 ~ 계속 진행중
-
-일시 : 매주 수요일 15:00 ~ 16:00 
+일시 : 매주 목요일 20:00 ~
 
 장소 : 디스코드 <br/>
 
@@ -67,7 +62,7 @@
 
 문제는 돌아가면서 프로그래머스 정해진 단계 사이의 문제를 골라와 수요일 내로 스터디원에게 공유한다.
 
-(24.04.01 ~ 24.05.26 : 0단계, 1단계 , 24.05.26 ~ : 1단계)
+(24.06.20 ~ )
 
 <img width="578" alt="image" src="https://github.com/forStudyingJavaScript/coding-test/assets/154623483/35a60df6-056f-4613-90b4-d7a5fd7912c1">
 
