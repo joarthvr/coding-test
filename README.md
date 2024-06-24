@@ -64,8 +64,6 @@
 
 (24.06.20 ~ )
 
-<img width="578" alt="image" src="https://github.com/forStudyingJavaScript/coding-test/assets/154623483/35a60df6-056f-4613-90b4-d7a5fd7912c1">
-
 <br/>
 <br/>
 
