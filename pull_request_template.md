@@ -1,135 +1,97 @@
 ## 1
 
-### 문제 - <code>가장 많이 받은 선물</code>
+### 문제 - <code>폰켓몬</code>
 
 ### 알고리즘 설계
 
 (왜 이렇게 코드를 작성했는지 이유를 적어주세요)
 
-1번 문제는 아직 제 실력으로 온전히 풀 수 있는 문제는 아닌 것 같아 검색을 통해 문제를 해결했습니다.
-완벽하게 풀지는 못했습니다 .. 
+1.	고유한 폰켓몬의 수 계산 (uniqueCount):
+	•	new Set(nums)를 사용하여 nums 배열에서 중복된 원소를 제거합니다. Set은 고유한 값만을 저장하기 때문에, Set의 크기는 배열 내 고유한 폰켓몬의 수를 의미합니다.
+	•	size 속성을 사용하여 Set의 크기를 계산합니다. 이 값은 uniqueCount 변수에 저장됩니다.
+2.	가져갈 수 있는 최대 폰켓몬의 수 계산 (maxAllowed):
+	•	문제에서 폰켓몬의 절반만 가져갈 수 있다고 명시했으므로, nums.length / 2를 계산하여 가져갈 수 있는 최대 폰켓몬의 수를 maxAllowed 변수에 저장합니다.
+3.	최종 반환 값 계산 및 반환:
+	•	고유한 폰켓몬의 수와 최대 가져갈 수 있는 폰켓몬의 수 중 작은 값을 반환합니다. Math.min(uniqueCount, maxAllowed)를 사용하여 이 값을 계산합니다.
+	•	이렇게 함으로써, 고유한 폰켓몬의 수가 전체의 절반보다 많다면 절반만큼만 가져갈 수 있게 되고, 그렇지 않다면 고유한 폰켓몬의 수만큼 가져가게 됩니다.
 
 ### 풀이 코드
 
 ```
-function solution(friends, gifts) {
-    // 친구 정보를 저장할 객체 초기화
-    let person = {};
-    friends.forEach(name => {
-        person[name] = {
-            send: {},
-            receive: {},
-            nextReceive: 0,
-            point: 0
-        };
-        friends.forEach(name2 => {
-            person[name].send[name2] = 0;
-            person[name].receive[name2] = 0;
-        });
-    });
-    // 선물 데이터를 기반으로 선물 주고받은 횟수 및 포인트 계산
-    gifts.forEach(data => {
-        let d = data.split(' ');
-        let sender = d[0];
-        let receiver = d[1];
-        person[sender].send[receiver]++;
-        person[sender].point++;
-        person[receiver].receive[sender]++;
-        person[receiver].point--;
-    });
-    for(let i=0; i<friends.length-1; i++){
-    for(let k=i+1; k<friends.length; k++){
-            if(
-                person[friends[i]].send[friends[k]] > person[friends[k]].send[friends[i]]
-            ) {
-                person[friends[i]].nextReceive++;
-            } else if (
-                person[friends[i]].send[friends[k]] < person[friends[k]].send[friends[i]]
-            ) {
-                person[friends[k]].nextReceive++;
-            } else if (
-                person[friends[i]].send[friends[k]] === person[friends[k]].send[friends[i]]
-            ) {
-                if(person[friends[i]].point > person[friends[k]].point){
-                    person[friends[i]].nextReceive++;
-                } else if (person[friends[i]].point < person[friends[k]].point){
-                    person[friends[k]].nextReceive++;
-                }
-            }
-    }
-}
-    let result = Object.entries(person).sort((a, b) => a[1].nextReceive - b[1].nextReceive);
-    let answer = result[result.length-1][1].nextReceive;
-
+function solution(nums) {
+    const uniqueCount = new Set(nums).size;  // 1. 중복된 원소를 제거하여 고유한 폰켓몬의 수를 계산합니다.
+    const maxAllowed = nums.length / 2;      // 2. 전체 폰켓몬의 절반만큼 가져갈 수 있으므로 배열 길이의 절반을 계산합니다.
     
-    
-    return answer;
+    return Math.min(uniqueCount, maxAllowed); // 3. 고유한 폰켓몬의 수와 최대 가져갈 수 있는 폰켓몬의 수 중 작은 값을 반환합니다.
 }
-
 ```
 
 ### 개인적인 회고와 다른 풀이
 
 (풀이 중 힘든 점이 있었다면 왜 힘들었고 어떻게 해결했는지, 아니면 이외의 좋을 것 같은 다른 풀이법이 있다면 같이 작성해주세요)
 
-문제를 접했을 때 인자값을 객체로 받아야할 거 같은데, 어떤 식으로 받아서 저장할지 막막했습니다.
-
-
-
-
 ### 느낀 점
 
 (풀면서 느낀점 이외에도 기억할 점이나 같이 논의하고 싶은 부분 등이 있다면 자유롭게 적어주세요)
-
-개인적으로 어려웠던 문제였습니다. 반복해서 풀어봐야할 문제라고 생각합니다. 고려해야할 요소들이 좀 까다롭다고 느껴졌습니다.
 
 
 ## 2
 
-### 문제 - <code>체육복</code>
+### 문제 - <code>크레인 인형뽑기</code>
 
 ### 알고리즘 설계
 
 (왜 이렇게 코드를 작성했는지 이유를 적어주세요)
-
-1. lost와 reserve를 오름차순으로 정렬
-2. 여분의 체육복을 가져왔지만 체육복이 도난당한 경우를 체크합니다
-결국 체육복이 있다는 것을 의미하므로 lost배열과 reserve 배열에서 각각 splice를 통해 제거합니다.
-3. lost 배열에서 체육복이 없는 경우 reserve 배열에서 lost배열 값의 -1, +1인 값이 reserve 배열에 존재한다면 체육복을 빌릴 수 있다는 것을 의미하므로
-체육복을 입을 수 있습니다
-4. 3번의 경우에 해당하지 않으면 체육복을 입을 수 없는 사람이 발생한 것을 의미하므로 n에서 한 명을 제외합니다.
-
-구현 순서는 3-4-2-1 순이었습니다. 3번을 했더니 50점 대가 나와서 2번의 경우를 체크하지 않았다는 것을 문제를 다시 읽고 파악했고 그 후 90점 대가 나와서 1번의 경우를 고려하지 않았다는 것을 알았습니다
+1.	보드 트랜스포즈:
+    •   트랜포즈는 배열의 행과 열을 뒤집는 것입니다
+	•	이 과정에서는 board 배열을 세로로 읽어서 board1 배열에 저장합니다. 
+	•	이중 for 루프를 사용하여, board[j][i]의 값을 읽고, 값이 0이 아닌 경우에만 tmpArr에 추가합니다.
+	•	tmpArr 배열은 각 열을 나타내며, 이 배열을 board1에 추가합니다.
+2.	바구니에 인형 추가 및 제거:
+	•	moves 배열의 각 움직임을 처리합니다.
+	•	moves 배열의 각 요소 e는 크레인의 움직임을 나타내며, 이는 인덱스 e-1로 변환되어(0이 없기 때문) board1 배열의 해당 열에 접근합니다.
+	•	board1[e-1]이 유효한 배열이고 비어 있지 않은 경우, 첫 번째 아이템을 item 변수에 저장합니다.
+	•	shift() 메서드를 사용하여 첫 번째 아이템을 board1[e-1] 배열에서 제거합니다.
+	•	basket 배열의 마지막 아이템과 현재 아이템이 동일한지 확인합니다.
+	•	동일하면 basket 배열의 마지막 아이템을 제거하고, result를 2 증가시킵니다.
+	•	동일하지 않으면 현재 아이템을 basket 배열에 추가합니다.
 
 ### 풀이 코드
 
 ```
-function solution(n, lost, reserve) {
-    // 여분의 체육복을 가진 학생과 도난당한 학생을 정렬합니다.
-    lost.sort((a, b) => a - b);
-    reserve.sort((a, b) => a - b);
-
-    // 여분의 체육복을 가진 학생이 도난당한 경우를 먼저 처리
-    for (let i = 0; i < reserve.length; i++) {
-        if (lost.includes(reserve[i])) {
-            lost.splice(lost.indexOf(reserve[i]), 1);
-            reserve.splice(i, 1);
-            i--;
+function solution(board, moves) {
+    let board1 = [];
+    
+    // board tranpose
+    for (let i = 0; i < board.length; i++) {
+        let tmpArr = [];
+        for (let j = 0; j < board.length; j++) {
+            if (board[j][i] === 0)
+                continue;
+            tmpArr.push(board[j][i]);
         }
+        board1.push(tmpArr);
     }
-    // 도난당한 학생이 여분의 체육복을 빌릴 수 있는지 확인
-    for (let i = 0; i < lost.length; i++) {
-        if(reserve.includes(lost[i] - 1)) {
-            reserve.splice(reserve.indexOf(lost[i] - 1), 1);
-            continue;
-        } 
-        if(reserve.includes(lost[i] + 1)) {
-            reserve.splice(reserve.indexOf(lost[i] + 1), 1);
-            continue;
-        } 
-            n--;
-    }
-    return n;
+    
+    let basket = [];
+    let result = 0;
+    
+    // moves를 처리하여 인형을 바구니에 추가
+    moves.forEach((e, index) => {
+        if (board1[e-1] && board1[e-1].length > 0) {
+            let item = board1[e-1][0]; // 첫 번째 아이템을 가져옵니다.
+            board1[e-1].shift(); // 첫 번째 아이템을 배열에서 제거합니다.
+            
+            if (basket.length > 0 && basket[basket.length - 1] === item) {
+                basket.pop(); // 바구니의 마지막 아이템과 동일하면 제거
+                result += 2; // 제거된 인형 수를 2개 증가
+            } else {
+                basket.push(item); // 그렇지 않으면 바구니에 추가
+            }
+        }
+    });
+
+    return result;
 }
 ```
 
@@ -137,48 +99,53 @@ function solution(n, lost, reserve) {
 
 (풀이 중 힘든 점이 있었다면 왜 힘들었고 어떻게 해결했는지, 아니면 이외의 좋을 것 같은 다른 풀이법이 있다면 같이 작성해주세요)
 
-저에게는 조금 쉽게 느껴지는 문제였습니다. 하지만 코드를 제출했을 때 90점만 나와서 의아했습니다. 
-그 이유는 lost배열과 reserve배열이 정렬되지 않은 상태로 주어지는 테스트케이스가 있었기 때문입니다.
-이 경우를 해결하기 위해서 먼저 lost 배열과 reserve 배열을 오름차순으로 정렬했더니 문제가 해결됐습니다.
+문제를 읽으면서 느낀 출제 의도는 스택을 알고 있는지, 이중 배열을 다룰 수 있는지에 대해 물어보는 거 같다고 느꼈습니다. 
 
+forEach()를 쓰면서 스택스럽게? 별로 안 풀어 봤는데 이번 기회에 풀어봐서 생각의 영역이 더 넓어진 느낌이었습니다.
 
 ### 느낀 점
 
 (풀면서 느낀점 이외에도 기억할 점이나 같이 논의하고 싶은 부분 등이 있다면 자유롭게 적어주세요)
 
-문제에서 배열이 정렬된 상태라고 명시하지 않은 상태거나 반복문으로 순차적으로 문제에 접근하는 경우 
-먼저 정렬해주고 문제를 푸는 것을 염두에 두어야겠다고 생각했습니다.
+스택스럽게? 푸는 방법 또는 스택을 구현하는 원리를 알고 가야한다고 생각합니다.
+
 
 ## 3
 
-### 문제 - <code>예산</code>
+### 문제 - <code>숫자 문자열과 영단어</code>
 
 ### 알고리즘 설계
 
 (왜 이렇게 코드를 작성했는지 이유를 적어주세요)
 
-1. 오름차순으로 d를 정렬합니다
-2. d의 크기 만큼 for문을 동작하면서 금액이 작은 순서대로 budget에 맞게 예산을 신청합니다.
-
-오름차순으로 정렬한 이유 예산에 맞춰 최대로 많은 부서의 물품을 구매해야하기 때문입니다.
-작은 예산을 책정한 부서의 물품부터 구매해야 최대한 많은 부서의 물품을 구매할 수 있습니다.
-
+1.	숫자 단어 배열 생성 (alphabet):
+	•	alphabet 배열에는 영어로 표현된 숫자 단어들이 0부터 9까지 순서대로 저장되어 있습니다.
+2.	각 단어에 대해 반복 (forEach):
+	•	alphabet 배열의 각 단어에 대해 반복문을 실행합니다.
+	•	word는 숫자를 영어로 표현한 단어를 나타내고, index는 해당 단어가 나타내는 숫자를 의미합니다.
+3.	단어를 숫자로 대체 (while 및 replace):
+	•	s.includes(word)는 문자열 s에 현재 단어 word가 포함되어 있는지 확인합니다.
+	•	포함되어 있는 동안, s.replace(word, index)를 사용하여 단어를 해당 숫자로 대체합니다.
+	•	이 작업을 문자열 s에서 해당 단어가 더 이상 발견되지 않을 때까지 반복합니다.
+4.	문자열을 숫자로 변환하여 리턴 (Number):
 ### 풀이 코드
 
 ```
-function solution(d, budget) {
-    d = d.sort((a,b) => a-b);
-    let sum = 0;
-    let cnt = 0;
-    for(let i = 0; i < d.length; i++){
-        if(sum + d[i] <= budget){
-            sum += d[i];
-            cnt++;
-        }
-        
+function solution(s) {
+  // 숫자를 영어로 표현한 단어들을 담은 배열
+  const alphabet = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+  
+  // 배열의 각 단어에 대해 반복
+  alphabet.forEach((word, index) => {
+    // 문자열 s에 해당 단어가 포함되어 있는 동안 반복
+    while (s.includes(word)) {
+      // 단어를 해당 숫자로 대체
+      s = s.replace(word, index);
     }
-    return cnt; 
-   
+  });
+
+  // 문자열을 숫자로 변환하여 반환
+  return Number(s);
 }
 ```
 
