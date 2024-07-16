@@ -1,28 +1,42 @@
 ## 1
 
-### 문제 - <code>폰켓몬</code>
+### 문제 - <code>덧칠하기</code>
 
 ### 알고리즘 설계
 
 (왜 이렇게 코드를 작성했는지 이유를 적어주세요)
 
-1.	고유한 폰켓몬의 수 계산 (uniqueCount):
-	•	new Set(nums)를 사용하여 nums 배열에서 중복된 원소를 제거합니다. Set은 고유한 값만을 저장하기 때문에, Set의 크기는 배열 내 고유한 폰켓몬의 수를 의미합니다.
-	•	size 속성을 사용하여 Set의 크기를 계산합니다. 이 값은 uniqueCount 변수에 저장됩니다.
-2.	가져갈 수 있는 최대 폰켓몬의 수 계산 (maxAllowed):
-	•	문제에서 폰켓몬의 절반만 가져갈 수 있다고 명시했으므로, nums.length / 2를 계산하여 가져갈 수 있는 최대 폰켓몬의 수를 maxAllowed 변수에 저장합니다.
-3.	최종 반환 값 계산 및 반환:
-	•	고유한 폰켓몬의 수와 최대 가져갈 수 있는 폰켓몬의 수 중 작은 값을 반환합니다. Math.min(uniqueCount, maxAllowed)를 사용하여 이 값을 계산합니다.
-	•	이렇게 함으로써, 고유한 폰켓몬의 수가 전체의 절반보다 많다면 절반만큼만 가져갈 수 있게 되고, 그렇지 않다면 고유한 폰켓몬의 수만큼 가져가게 됩니다.
+1. section 배열의 각 원소(구역의 시작 지점)를 순회합니다.
+2. 현재 구역이 part (현재까지 칠한 구역의 끝 지점)보다 큰지 확인합니다.
+   • n > part 조건이 참이면, 현재 구역을 페인트칠해야 합니다.
+3. 현재 구역을 페인트칠하고, part 변수를 업데이트합니다.
+   • part = n + m - 1로 현재 구역의 끝 지점을 계산하여 part에 저장합니다.
+4. 페인트를 칠했으므로 answer 변수를 1 증가시킵니다.
+5. 배열의 모든 원소를 순회한 후, 최종적으로 answer 값을 반환합니다.
 
 ### 풀이 코드
 
 ```
-function solution(nums) {
-    const uniqueCount = new Set(nums).size;  // 1. 중복된 원소를 제거하여 고유한 폰켓몬의 수를 계산합니다.
-    const maxAllowed = nums.length / 2;      // 2. 전체 폰켓몬의 절반만큼 가져갈 수 있으므로 배열 길이의 절반을 계산합니다.
-    
-    return Math.min(uniqueCount, maxAllowed); // 3. 고유한 폰켓몬의 수와 최대 가져갈 수 있는 폰켓몬의 수 중 작은 값을 반환합니다.
+function solution(n, m, section) {
+  let answer = 0;
+
+  // 현재까지 칠한 구역
+  let part = 0;
+
+  // section을 forEach() 메서드로 하나씩 확인한다.
+  section.forEach((n) => {
+
+    // 현재 구역이 현재까지 칠한 구역보다 크다면
+    if (n > part) {
+
+      // 구역을 칠해주고 현재까지 칠한 구역을 업데이트 시켜준다.
+      part = n + m - 1;
+      // 페인트를 칠했으니 1증가 시킨다.
+      answer++;
+    }
+  });
+
+  return answer;
 }
 ```
 
@@ -34,61 +48,102 @@ function solution(nums) {
 
 (풀면서 느낀점 이외에도 기억할 점이나 같이 논의하고 싶은 부분 등이 있다면 자유롭게 적어주세요)
 
+문제를 읽었을 때 뭔가 헷갈렸는데 좀 단순하게 접근하니 풀렸던 문제였습니다.
 
 ## 2
 
-### 문제 - <code>크레인 인형뽑기</code>
+### 문제 - <code>실패율</code>
 
 ### 알고리즘 설계
 
 (왜 이렇게 코드를 작성했는지 이유를 적어주세요)
-1.	보드 트랜스포즈:
-    •   트랜포즈는 배열의 행과 열을 뒤집는 것입니다
-	•	이 과정에서는 board 배열을 세로로 읽어서 board1 배열에 저장합니다. 
-	•	이중 for 루프를 사용하여, board[j][i]의 값을 읽고, 값이 0이 아닌 경우에만 tmpArr에 추가합니다.
-	•	tmpArr 배열은 각 열을 나타내며, 이 배열을 board1에 추가합니다.
-2.	바구니에 인형 추가 및 제거:
-	•	moves 배열의 각 움직임을 처리합니다.
-	•	moves 배열의 각 요소 e는 크레인의 움직임을 나타내며, 이는 인덱스 e-1로 변환되어(0이 없기 때문) board1 배열의 해당 열에 접근합니다.
-	•	board1[e-1]이 유효한 배열이고 비어 있지 않은 경우, 첫 번째 아이템을 item 변수에 저장합니다.
-	•	shift() 메서드를 사용하여 첫 번째 아이템을 board1[e-1] 배열에서 제거합니다.
-	•	basket 배열의 마지막 아이템과 현재 아이템이 동일한지 확인합니다.
-	•	동일하면 basket 배열의 마지막 아이템을 제거하고, result를 2 증가시킵니다.
-	•	동일하지 않으면 현재 아이템을 basket 배열에 추가합니다.
+
+1. for 루프를 사용하여 1부터 N까지의 각 스테이지 번호에 대해 반복합니다.
+2. reach: 해당 스테이지에 도달한 플레이어 수를 계산합니다. (해당 스테이지 이상인 플레이어 수)
+   • stages.filter((x) => x >= i).length는 스테이지 i 이상에 도달한 플레이어 수를 셉니다.
+3. curr: 해당 스테이지에 머물러 있는 플레이어 수를 계산합니다.
+   • stages.filter((x) => x === i).length는 현재 스테이지 i에서 도전 중인 플레이어 수를 셉니다.
+4. result 배열에 스테이지 번호와 실패율(= curr / reach)을 추가합니다.
+   • 실패율은 현재 스테이지에서 도전 중인 플레이어 수를 해당 스테이지 이상 도달한 플레이어 수로 나눈 값입니다.
+5. result 배열을 실패율을 기준으로 내림차순으로 정렬합니다.
+6. 정렬된 result 배열에서 스테이지 번호만 추출하여 반환합니다.
 
 ### 풀이 코드
 
 ```
-function solution(board, moves) {
-    let board1 = [];
-    
-    // board tranpose
-    for (let i = 0; i < board.length; i++) {
-        let tmpArr = [];
-        for (let j = 0; j < board.length; j++) {
-            if (board[j][i] === 0)
-                continue;
-            tmpArr.push(board[j][i]);
-        }
-        board1.push(tmpArr);
+function solution(N, stages) {
+    let result = [];
+
+    for(let i = 1; i <= N; i++) {
+        let reach = stages.filter((x) => x >= i).length;  // 스테이지 i에 도달한 플레이어 수
+        let curr = stages.filter((x) => x === i).length;  // 스테이지 i에서 머물러 있는 플레이어 수
+        result.push([i, curr / reach]);  // 스테이지 번호와 실패율을 배열에 추가
     }
-    
-    let basket = [];
-    let result = 0;
-    
-    // moves를 처리하여 인형을 바구니에 추가
-    moves.forEach((e, index) => {
-        if (board1[e-1] && board1[e-1].length > 0) {
-            let item = board1[e-1][0]; // 첫 번째 아이템을 가져옵니다.
-            board1[e-1].shift(); // 첫 번째 아이템을 배열에서 제거합니다.
-            
-            if (basket.length > 0 && basket[basket.length - 1] === item) {
-                basket.pop(); // 바구니의 마지막 아이템과 동일하면 제거
-                result += 2; // 제거된 인형 수를 2개 증가
+
+    result.sort((a, b) => b[1] - a[1]);  // 실패율에 따라 내림차순으로 정렬
+    return result.map((x) => x[0]);  // 정렬된 스테이지 번호만 추출하여 반환
+}
+```
+
+### 개인적인 회고와 다른 풀이
+
+(풀이 중 힘든 점이 있었다면 왜 힘들었고 어떻게 해결했는지, 아니면 이외의 좋을 것 같은 다른 풀이법이 있다면 같이 작성해주세요)
+
+### 느낀 점
+
+(풀면서 느낀점 이외에도 기억할 점이나 같이 논의하고 싶은 부분 등이 있다면 자유롭게 적어주세요)
+
+실패율을 계산해서 순위를 매기는 것보다 스테이지 번호를 출력하는 것이 고민이었습니다. 배열 안에 실패율과 스테이지 번호를 함께 넣음으로서 해결했습니다.
+
+## 3
+
+### 문제 - <code>대충 만든 자판</code>
+
+### 알고리즘 설계
+
+(왜 이렇게 코드를 작성했는지 이유를 적어주세요)
+
+1. 각 타겟 문자열에 대해 반복합니다.
+2. 각 타겟 문자열의 각 문자를 순회하며 처리합니다.
+3. 각 키맵 행에 대해 문자의 인덱스를 찾고, 이를 indexArr에 추가합니다.
+   • 인덱스는 1부터 시작하도록 +1을 합니다.
+4. indexArr에서 최소값을 찾아 minIndex에 저장합니다.
+   • minIndex가 10001이면 해당 문자가 키맵에 없다는 의미입니다.
+5. 문자가 키맵에 없으면 sum을 -1로 설정하고, 해당 타겟 문자열의 처리를 중단합니다.
+6. 그렇지 않으면 sum에 minIndex를 누적합니다.
+7. 모든 문자를 처리한 후, sum을 result 배열에 추가합니다.
+8. 모든 타겟 문자열에 대해 반복이 끝나면, result 배열을 반환합니다.
+
+### 풀이 코드
+
+```
+function solution(keymap, targets) {
+    let result = [];
+
+    targets.forEach(target => {
+        let sum = 0;
+
+        for (let i = 0; i < target.length; i++) {
+            let indexArr = [10001];  // 각 문자의 인덱스를 저장하는 배열을 초기화
+
+            for (let j = 0; j < keymap.length; j++) {
+                let index = keymap[j].indexOf(target[i]);
+                if (index >= 0) {
+                    indexArr.push(index + 1);  // 인덱스는 1부터 시작하므로 +1
+                }
+            }
+
+            let minIndex = Math.min(...indexArr);
+
+            if (minIndex === 10001) {  // 키맵에 문자가 없는 경우
+                sum = -1;
+                break;  // 현재 타겟 문자열에 대해 더 이상 계산할 필요가 없음
             } else {
-                basket.push(item); // 그렇지 않으면 바구니에 추가
+                sum += minIndex;
             }
         }
+
+        result.push(sum);
     });
 
     return result;
@@ -99,63 +154,8 @@ function solution(board, moves) {
 
 (풀이 중 힘든 점이 있었다면 왜 힘들었고 어떻게 해결했는지, 아니면 이외의 좋을 것 같은 다른 풀이법이 있다면 같이 작성해주세요)
 
-문제를 읽으면서 느낀 출제 의도는 스택을 알고 있는지, 이중 배열을 다룰 수 있는지에 대해 물어보는 거 같다고 느꼈습니다. 
-
-forEach()를 쓰면서 스택스럽게? 별로 안 풀어 봤는데 이번 기회에 풀어봐서 생각의 영역이 더 넓어진 느낌이었습니다.
-
 ### 느낀 점
 
 (풀면서 느낀점 이외에도 기억할 점이나 같이 논의하고 싶은 부분 등이 있다면 자유롭게 적어주세요)
 
-스택스럽게? 푸는 방법 또는 스택을 구현하는 원리를 알고 가야한다고 생각합니다.
-
-
-## 3
-
-### 문제 - <code>숫자 문자열과 영단어</code>
-
-### 알고리즘 설계
-
-(왜 이렇게 코드를 작성했는지 이유를 적어주세요)
-
-1.	숫자 단어 배열 생성 (alphabet):
-	•	alphabet 배열에는 영어로 표현된 숫자 단어들이 0부터 9까지 순서대로 저장되어 있습니다.
-2.	각 단어에 대해 반복 (forEach):
-	•	alphabet 배열의 각 단어에 대해 반복문을 실행합니다.
-	•	word는 숫자를 영어로 표현한 단어를 나타내고, index는 해당 단어가 나타내는 숫자를 의미합니다.
-3.	단어를 숫자로 대체 (while 및 replace):
-	•	s.includes(word)는 문자열 s에 현재 단어 word가 포함되어 있는지 확인합니다.
-	•	포함되어 있는 동안, s.replace(word, index)를 사용하여 단어를 해당 숫자로 대체합니다.
-	•	이 작업을 문자열 s에서 해당 단어가 더 이상 발견되지 않을 때까지 반복합니다.
-4.	문자열을 숫자로 변환하여 리턴 (Number):
-### 풀이 코드
-
-```
-function solution(s) {
-  // 숫자를 영어로 표현한 단어들을 담은 배열
-  const alphabet = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
-  
-  // 배열의 각 단어에 대해 반복
-  alphabet.forEach((word, index) => {
-    // 문자열 s에 해당 단어가 포함되어 있는 동안 반복
-    while (s.includes(word)) {
-      // 단어를 해당 숫자로 대체
-      s = s.replace(word, index);
-    }
-  });
-
-  // 문자열을 숫자로 변환하여 반환
-  return Number(s);
-}
-```
-
-### 개인적인 회고와 다른 풀이
-
-(풀이 중 힘든 점이 있었다면 왜 힘들었고 어떻게 해결했는지, 아니면 이외의 좋을 것 같은 다른 풀이법이 있다면 같이 작성해주세요)
-
-
-
-### 느낀 점
-
-(풀면서 느낀점 이외에도 기억할 점이나 같이 논의하고 싶은 부분 등이 있다면 자유롭게 적어주세요)
-
+딱히 묘수가 떠오르지 않아 타겟 원소 처음 부터 시작해서 키맵을 전부 순회했습니다 더 효율적인 코드가 있을 거 같습니다..
