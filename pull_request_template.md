@@ -1,42 +1,24 @@
 ## 1
 
-### 문제 - <code>덧칠하기</code>
+### 문제 - <code>같은숫자는싫어</code>
 
 ### 알고리즘 설계
 
 (왜 이렇게 코드를 작성했는지 이유를 적어주세요)
 
-1. section 배열의 각 원소(구역의 시작 지점)를 순회합니다.
-2. 현재 구역이 part (현재까지 칠한 구역의 끝 지점)보다 큰지 확인합니다.
-   • n > part 조건이 참이면, 현재 구역을 페인트칠해야 합니다.
-3. 현재 구역을 페인트칠하고, part 변수를 업데이트합니다.
-   • part = n + m - 1로 현재 구역의 끝 지점을 계산하여 part에 저장합니다.
-4. 페인트를 칠했으므로 answer 변수를 1 증가시킵니다.
-5. 배열의 모든 원소를 순회한 후, 최종적으로 answer 값을 반환합니다.
-
 ### 풀이 코드
 
 ```
-function solution(n, m, section) {
-  let answer = 0;
-
-  // 현재까지 칠한 구역
-  let part = 0;
-
-  // section을 forEach() 메서드로 하나씩 확인한다.
-  section.forEach((n) => {
-
-    // 현재 구역이 현재까지 칠한 구역보다 크다면
-    if (n > part) {
-
-      // 구역을 칠해주고 현재까지 칠한 구역을 업데이트 시켜준다.
-      part = n + m - 1;
-      // 페인트를 칠했으니 1증가 시킨다.
-      answer++;
+javascript
+function solution(arr)
+{
+    let ans = [];
+    for(let i = 0; i < arr.length; i++){
+        if(arr[i] === arr[i+1])
+            continue;
+            ans.push(arr[i]);
     }
-  });
-
-  return answer;
+   return ans;
 }
 ```
 
@@ -47,41 +29,27 @@ function solution(n, m, section) {
 ### 느낀 점
 
 (풀면서 느낀점 이외에도 기억할 점이나 같이 논의하고 싶은 부분 등이 있다면 자유롭게 적어주세요)
-
-문제를 읽었을 때 뭔가 헷갈렸는데 좀 단순하게 접근하니 풀렸던 문제였습니다.
 
 ## 2
 
-### 문제 - <code>실패율</code>
+### 문제 - <code>K번째수</code>
 
 ### 알고리즘 설계
 
 (왜 이렇게 코드를 작성했는지 이유를 적어주세요)
 
-1. for 루프를 사용하여 1부터 N까지의 각 스테이지 번호에 대해 반복합니다.
-2. reach: 해당 스테이지에 도달한 플레이어 수를 계산합니다. (해당 스테이지 이상인 플레이어 수)
-   • stages.filter((x) => x >= i).length는 스테이지 i 이상에 도달한 플레이어 수를 셉니다.
-3. curr: 해당 스테이지에 머물러 있는 플레이어 수를 계산합니다.
-   • stages.filter((x) => x === i).length는 현재 스테이지 i에서 도전 중인 플레이어 수를 셉니다.
-4. result 배열에 스테이지 번호와 실패율(= curr / reach)을 추가합니다.
-   • 실패율은 현재 스테이지에서 도전 중인 플레이어 수를 해당 스테이지 이상 도달한 플레이어 수로 나눈 값입니다.
-5. result 배열을 실패율을 기준으로 내림차순으로 정렬합니다.
-6. 정렬된 result 배열에서 스테이지 번호만 추출하여 반환합니다.
-
 ### 풀이 코드
 
 ```
-function solution(N, stages) {
-    let result = [];
-
-    for(let i = 1; i <= N; i++) {
-        let reach = stages.filter((x) => x >= i).length;  // 스테이지 i에 도달한 플레이어 수
-        let curr = stages.filter((x) => x === i).length;  // 스테이지 i에서 머물러 있는 플레이어 수
-        result.push([i, curr / reach]);  // 스테이지 번호와 실패율을 배열에 추가
+javascript
+function solution(array, commands) {
+    let ans = [];
+    let tmpArr = [];
+    for(let i = 0; i < commands.length; i++){
+       tmpArr = array.slice(commands[i][0]-1,commands[i][1]).sort((a,b) => a-b);
+       ans[i] = tmpArr[commands[i][2]-1]
     }
-
-    result.sort((a, b) => b[1] - a[1]);  // 실패율에 따라 내림차순으로 정렬
-    return result.map((x) => x[0]);  // 정렬된 스테이지 번호만 추출하여 반환
+    return ans;
 }
 ```
 
@@ -92,8 +60,6 @@ function solution(N, stages) {
 ### 느낀 점
 
 (풀면서 느낀점 이외에도 기억할 점이나 같이 논의하고 싶은 부분 등이 있다면 자유롭게 적어주세요)
-
-실패율을 계산해서 순위를 매기는 것보다 스테이지 번호를 출력하는 것이 고민이었습니다. 배열 안에 실패율과 스테이지 번호를 함께 넣음으로서 해결했습니다.
 
 ## 3
 
@@ -102,52 +68,81 @@ function solution(N, stages) {
 ### 알고리즘 설계
 
 (왜 이렇게 코드를 작성했는지 이유를 적어주세요)
+1단계 new*id의 모든 대문자를 대응되는 소문자로 치환합니다.
+2단계 new_id에서 알파벳 소문자, 숫자, 빼기(-), 밑줄(*), 마침표(.)를 제외한 모든 문자를 제거합니다.
+3단계 new_id에서 마침표(.)가 2번 이상 연속된 부분을 하나의 마침표(.)로 치환합니다.
+4단계 new_id에서 마침표(.)가 처음이나 끝에 위치한다면 제거합니다.
+5단계 new_id가 빈 문자열이라면, new_id에 "a"를 대입합니다.
+6단계 new_id의 길이가 16자 이상이면, new_id의 첫 15개의 문자를 제외한 나머지 문자들을 모두 제거합니다.
+만약 제거 후 마침표(.)가 new_id의 끝에 위치한다면 끝에 위치한 마침표(.) 문자를 제거합니다.
+7단계 new_id의 길이가 2자 이하라면, new_id의 마지막 문자를 new_id의 길이가 3이 될 때까지 반복해서 끝에 붙입니다.
 
-1. 각 타겟 문자열에 대해 반복합니다.
-2. 각 타겟 문자열의 각 문자를 순회하며 처리합니다.
-3. 각 키맵 행에 대해 문자의 인덱스를 찾고, 이를 indexArr에 추가합니다.
-   • 인덱스는 1부터 시작하도록 +1을 합니다.
-4. indexArr에서 최소값을 찾아 minIndex에 저장합니다.
-   • minIndex가 10001이면 해당 문자가 키맵에 없다는 의미입니다.
-5. 문자가 키맵에 없으면 sum을 -1로 설정하고, 해당 타겟 문자열의 처리를 중단합니다.
-6. 그렇지 않으면 sum에 minIndex를 누적합니다.
-7. 모든 문자를 처리한 후, sum을 result 배열에 추가합니다.
-8. 모든 타겟 문자열에 대해 반복이 끝나면, result 배열을 반환합니다.
+문제에서 너무 친절하게 단계별로 설명해줍니다.
 
 ### 풀이 코드
 
 ```
-function solution(keymap, targets) {
-    let result = [];
+javascript
+function solution(new_id) {
+    //1단계 모든 대문자를 소문자로 변경
+    new_id = new_id.toLowerCase()
 
-    targets.forEach(target => {
-        let sum = 0;
+    new_id = new_id.split("") // 계산하기 쉽게 스플릿
 
-        for (let i = 0; i < target.length; i++) {
-            let indexArr = [10001];  // 각 문자의 인덱스를 저장하는 배열을 초기화
-
-            for (let j = 0; j < keymap.length; j++) {
-                let index = keymap[j].indexOf(target[i]);
-                if (index >= 0) {
-                    indexArr.push(index + 1);  // 인덱스는 1부터 시작하므로 +1
-                }
+    // 2단계 new_id에서 알파벳 소문자, 숫자, 빼기(-), 밑줄(_), 마침표(.)를 제외한 모든 문자를 제거합니다.
+    for(let i =0; i < new_id.length; i++){
+        if(isNaN(new_id[i])){
+            if(new_id[i] === '-' ||
+               new_id[i] === '_' ||
+               new_id[i] === '.' ||
+               (new_id[i].charCodeAt() >=97 && new_id[i].charCodeAt() <= 122)){
+                continue;
             }
-
-            let minIndex = Math.min(...indexArr);
-
-            if (minIndex === 10001) {  // 키맵에 문자가 없는 경우
-                sum = -1;
-                break;  // 현재 타겟 문자열에 대해 더 이상 계산할 필요가 없음
-            } else {
-                sum += minIndex;
+            else{
+                new_id.splice(i,1);
+                i--;
             }
         }
+        else{
+            continue;
+        }
+    }
+    let id2 = [] //3단계를 위해 옮겨탈 새로운 배열 선언
 
-        result.push(sum);
-    });
+    //3단계 new_id에서 마침표(.)가 2번 이상 연속된 부분을 하나의 마침표(.)로 치환합니다
+    for(let i = 0; i < new_id.length; i++){
+        if(id2[id2.length-1] === new_id[i] && new_id[i] === '.')
+            continue;
+        id2.push(new_id[i])
+    }
 
-    return result;
+    //4단계 new_id에서 마침표(.)가 처음이나 끝에 위치한다면 제거합니다.
+    if(id2[0] === '.' )
+        id2.shift();
+    if(id2[id2.length-1] === '.')
+        id2.pop()
+
+    //5단계 new_id가 빈 문자열이라면, new_id에 "a"를 대입합니다.
+    if(id2.length === 0)
+        id2.push('a')
+
+    // 6단계 new_id의 길이가 16자 이상이면, new_id의 첫 15개의 문자를 제외한 나머지 문자들을 모두 제거합니다.
+    // 만약 제거 후 마침표(.)가 new_id의 끝에 위치한다면 끝에 위치한 마침표(.) 문자를 제거합니다.
+    if(id2.length >= 16){
+        id2 = id2.slice(0,15);
+        if(id2[id2.length-1] === '.')
+            id2.pop();
+    }
+
+    // 7단계 new_id의 길이가 2자 이하라면, new_id의 마지막 문자를 new_id의 길이가 3이 될 때까지 반복해서 끝에 붙입니다.
+    if(id2.length <= 2){
+        const addItem = id2[id2.length-1];
+        while(id2.length < 3)
+            id2.push(addItem)
+    }
+    return id2.join("");
 }
+
 ```
 
 ### 개인적인 회고와 다른 풀이
@@ -158,4 +153,5 @@ function solution(keymap, targets) {
 
 (풀면서 느낀점 이외에도 기억할 점이나 같이 논의하고 싶은 부분 등이 있다면 자유롭게 적어주세요)
 
-딱히 묘수가 떠오르지 않아 타겟 원소 처음 부터 시작해서 키맵을 전부 순회했습니다 더 효율적인 코드가 있을 거 같습니다..
+하라는 대로 했더니 문제가 풀렸습니다...
+뭔가 이전에 풀어봤을법한 문제를 전부 해보라는 느낌을 받았습니다
