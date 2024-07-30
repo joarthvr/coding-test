@@ -27,5 +27,5 @@ function solution(number, limit, power) {
   // 배열의 합 계산
   let result = cnt.reduce((a, e) => a + e, 0);
 
-  return result;``
+  return result;
 }
