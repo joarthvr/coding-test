@@ -1,48 +1,42 @@
 ## 1
 
-### 문제 - <code>모의고사</code>
+### 문제 - <code>비밀지도</code>
 
 ### 알고리즘 설계
 
 (왜 이렇게 코드를 작성했는지 이유를 적어주세요)
-
+1. 이진수로 각각 변환후 padStart로 빈 부분을 0으로 채워줍니다
+2. 순회하며 겹치는 부분을 처리합니다.
 ### 풀이 코드
 
 ```
 javascript
-function solution(answers) {
-    let a = [1, 2, 3, 4, 5];
-    let b = [2, 1, 2, 3, 2, 4, 2, 5];
-    let c = [3, 3, 1, 1, 2, 2, 4, 4, 5, 5];
-
-    // 맞춘 개수를 저장할 객체
-    let cnt = { 1: 0, 2: 0, 3: 0 };
-
-    // 각 답안 패턴과 정답을 비교하여 맞춘 개수 세기
-    for (let i = 0; i < answers.length; i++) {
-        if (answers[i] === a[i % a.length]) cnt[1]++;
-        if (answers[i] === b[i % b.length]) cnt[2]++;
-        if (answers[i] === c[i % c.length]) cnt[3]++;
-    }
-
-    // 최대 맞춘 개수 찾기
-    let maxScore = Math.max(cnt[1], cnt[2], cnt[3]);
-
-    // 최대 맞춘 개수를 가진 사람 찾기
+function solution(n, arr1, arr2) {
+    arr1 = arr1.map(e => e.toString(2).padStart(n, '0'));
+    arr2 = arr2.map(e => e.toString(2).padStart(n, '0'));
     let result = [];
-    for (let key in cnt) {
-        if (cnt[key] === maxScore) {
-            result.push(Number(key));
+    let tmp = ""
+    for(let i = 0; i < n; i++){
+        tmp = ""
+        for(let j = 0; j < n; j++){
+            if(arr1[i][j] === '0' && arr2[i][j] === '0'){
+                tmp +=" ";
+            }
+            else{
+                tmp +="#";
+            }
         }
+        result.push(tmp);
     }
-
-    return result;
+    return result
 }
+
 ```
 
 ### 개인적인 회고와 다른 풀이
 
 (풀이 중 힘든 점이 있었다면 왜 힘들었고 어떻게 해결했는지, 아니면 이외의 좋을 것 같은 다른 풀이법이 있다면 같이 작성해주세요)
+padStart 메서드를 알 수 있었습니다.
 
 ### 느낀 점
 
@@ -50,82 +44,95 @@ function solution(answers) {
 
 ## 2
 
-### 문제 - <code>공원 산책</code>
+### 문제 - <code>다트게임</code>
 
 ### 알고리즘 설계
-
+1. dartResult를 숫자는 숫자로 문자는 문자로 split합니다.
+2. 숫자를 기준으로 나눠 새로운 배열에 담았습니다
+    2-1 ex-[1,"S",2,"D","*",3,"T"] => [[1,'S'],[2,'D','*'],[3,'T']]
+3. 순회하며 논리에 맞게 배열의 첫번째 원소부터 계산해서 다시 배열에 담았습니다.
+    3-1 ex- [ 2, 8, 27 ]
+4. 3의 배열을 모두 더합니다.
 (왜 이렇게 코드를 작성했는지 이유를 적어주세요)
-1. 객체로 첫 시작점을 세팅합니다. (나중에 호출하기 편하게)
-2. 서쪽 동쪽의 경우 열에서 열(<-, ->)로 이동하고 북쪽 남쪽의 경우 배열의 원소 간 행에서 행(ㅅ,v)으로 이동하므로 두 부류를 함수로 구현했습니다. 
-2-1. 동쪽의 경우 오른쪽으로 이동하므로 시작점 col에서 더해서 크기를 벗어나는지 확인하고 가는 길 중간에 X가 있는지 slice로 경로를 잘라와 확인합니다.
-2-2. 서쪽의 경우 왼쪽으로 이동하므로 시작점 col에서 빼서 크기를 벗어나는지 확인하고 가는 길 중간에 X가 있는지 slice로 경로를 잘라와 확인합니다.
-2-3. 북쪽의 경우 위쪽으로 이동하므로 시작점 row에서 빼서 크기를 벗어나는지 확인하고 가는 길 중간에 X가 있는지 slice로 경로를 잘라와 확인합니다.
-2-4. 남쪽의 경우 아래쪽으로 이동하므로 시작점 row에서 더해서 크기를 벗어나는지 확인하고 가는 길 중간에 X가 있는지 slice로 경로를 잘라와 확인합니다.
-3. 반복문을 통해 조건에 따라 함수들을 호출합니다.
+
 ### 풀이 코드
 
 ```
 javascript
-function solution(park, routes) {
-    let START;
+function solution(dartResult) {
+  // 문자열을 배열로 변환하고, 숫자는 정수로 변환
+  dartResult = dartResult
+    .split("")
+    .map((e) => (Math.floor(e) >= 0 ? Math.floor(e) : e));
+  const result = []; // 최종 결과를 저장할 배열
+  let currentGroup = []; // 현재 처리 중인 그룹을 저장할 배열
+  const numSave = [];
+  let currentNumber = "";
 
-    // 시작 위치 찾기
-    park.forEach((e, i) => {
-        const location = e.split("").findIndex(char => char === "S");
-        if (location !== -1) {
-            START = { row: i, col: location }; // 행과 열의 위치를 저장
-        }
-    });
+  for (let i = 0; i < dartResult.length; i++) {
+    const element = dartResult[i];
 
-    const eastOrWest = (way) => {
-        let howManyToGo = parseInt(way[2]);
-        if (way[0] === "E") {
-            if (START.col + howManyToGo >= park[0].length ||
-                park[START.row].slice(START.col, START.col + howManyToGo + 1).includes("X")) {
-                return;
-            }
-            START.col += howManyToGo;
+    if (typeof element === "number") {
+      // 숫자인 경우, 현재 숫자에 추가
+      currentNumber += element;
+    } else {
+      // 문자인 경우, 이전에 처리 중이던 숫자가 있다면 그룹에 추가
+      if (currentNumber !== "") {
+        // 이전 그룹이 있다면 결과에 추가
+        if (currentGroup.length > 0) {
+          result.push(currentGroup);
+          currentGroup = [];
         }
-        if (way[0] === "W") {
-            if (START.col - howManyToGo < 0 ||
-                park[START.row].slice(START.col - howManyToGo, START.col).includes("X")) {
-                return;
-            }
-            START.col -= howManyToGo;
-        }
-    };
+        currentGroup.push(parseInt(currentNumber));
+        currentNumber = "";
+      }
+      // 현재 문자를 그룹에 추가
+      currentGroup.push(element);
+    }
+  }
 
-    const northOrSouth = (way) => {
-        let howManyToGo = parseInt(way[2]);
-        if (way[0] === "N") {
-            if (START.row - howManyToGo < 0 ||
-                park.slice(START.row - howManyToGo, START.row).some(row => row[START.col] === "X")) {
-                return;
-            }
-            START.row -= howManyToGo;
-        }
-        if (way[0] === "S") {
-            if (START.row + howManyToGo >= park.length ||
-                park.slice(START.row, START.row + howManyToGo + 1).some(row => row[START.col] === "X")) {
-                return;
-            }
-            START.row += howManyToGo;
-        }
-    };
+  // 마지막 그룹 처리
+  if (currentNumber !== "") {
+    currentGroup.push(parseInt(currentNumber));
+  }
+  if (currentGroup.length > 0) {
+    result.push(currentGroup);
+  }
 
-    // 주어진 경로를 순회하며 이동
-    routes.forEach((e) => {
-        if (e[0] === "E" || e[0] === "W") {
-            eastOrWest(e);
-        }
-        if (e[0] === "N" || e[0] === "S") {
-            northOrSouth(e);
-        }
-    });
+  // console.log(result[0].length);
+  for (let i = 0; i < result.length; i++) {
+    const element = result[i];
+    let middleResult = 0;
+    const num = element[0];
 
-    return [START.row, START.col]; // 최종 위치를 반환
+    const pow = element[1];
+
+    if (pow === "S") middleResult += num;
+    if (pow === "D") middleResult += Math.pow(num, 2);
+    if (pow === "T") middleResult += Math.pow(num, 3);
+
+    if (element.length >= 3) {
+      const bonus = element[2];
+
+      if (bonus === "*") {
+        middleResult = middleResult * 2;
+        numSave[numSave.length - 1]
+          ? (numSave[numSave.length - 1] = numSave[numSave.length - 1] * 2)
+          : (numSave[numSave.length - 1] = numSave[numSave.length - 1]);
+      }
+      if (bonus === "#") {
+        middleResult = -middleResult;
+      }
+    }
+    numSave.push(middleResult);
+  }
+
+  const allSum = numSave.reduce((acc, e) => {
+    return (acc += e);
+  }, 0);
+
+  return allSum;
 }
-
 
 
 ```
@@ -133,6 +140,8 @@ function solution(park, routes) {
 ### 개인적인 회고와 다른 풀이
 
 (풀이 중 힘든 점이 있었다면 왜 힘들었고 어떻게 해결했는지, 아니면 이외의 좋을 것 같은 다른 풀이법이 있다면 같이 작성해주세요)
+제일 어려운 문제였습니다. 문제의 원리를 파악하는 건 수월했지만 구현하기가 저에겐 까다로웠습니다.
+도움을 좀 받아서 풀었고 다시 풀어볼 생각입니다.
 
 ### 느낀 점
 
@@ -140,81 +149,33 @@ function solution(park, routes) {
 
 ## 3
 
-### 문제 - <code>붕대 감기</code>
+### 문제 - <code>로또 최고 순위와 최저 순위</code>
 
 ### 알고리즘 설계
 
 (왜 이렇게 코드를 작성했는지 이유를 적어주세요)
-
-1. 어택 배열을 보기좋게 객체로 받아왔습니다
-2. 문제의 조건에 맞게 for문을 호출하여 healthRecoveryCount의 값을 1씩 올립니다
-3. counter의 값에 따라 어택이 발생한 경우 데미지를 주고 카운터를 초기화 시킵니다
-4. 보너스 회복의 경우 추가 체력을 회복하고 맥스값이 넘지 않게 설정합니다.
-5. 0이하로 내려갈 경우 -1을 반환합니다.
+1. 맞춘 개수에 따라 순위를 결정할 수 있게 순위를 담은 배열을 생성합니다.
+2. 필터를 통해 당첨 번호와 비교하여 최소로 맞출 수 있는 개수를 저장합니다.
+3. 0의 개수를 세서 최대 맞출 수 있는 로또 개수를 계산합니다.
+4. 각 개수에 따라 순위를 결정합니다.
 
 ### 풀이 코드
 
 ```
 javascript
-function solution(bandage, health, attacks) {
-  const TOTAL_TIME = attacks[attacks.length - 1][0];
-  const attackTimes = attacks.reduce((acc, [time, damage]) => {
-    acc[time] = damage;
-    return acc;
-  }, {});
+function solution(lottos, win_nums) {
+    const score = [6, 6, 5, 4, 3, 2, 1];  // 맞춘 개수에 따른 순위 배열
+    const min = lottos.filter(num => win_nums.includes(num)).length;  // 최소 맞춘 개수
+    const zeroCnt = lottos.filter(num => num === 0).length;  // 0의 개수
+    const max = min + zeroCnt;  // 최대로 맞출 수 있는 개수
 
-  const [maintainTime, recoveryAmount, bonusRecovery] = bandage;
-  let healthRecoveryCounter = 0;
-  const MAX_HEALTH = health;
-
-  // 함수: 공격을 처리하고, 체력을 감소시키는 함수
-  const applyAttack = (currentHealth, damage) => {
-    currentHealth -= damage;
-    return currentHealth;
-  };
-
-  // 함수: 체력을 회복시키는 함수
-  const recoverHealth = (currentHealth, amount) => {
-    currentHealth += amount;
-    return Math.min(currentHealth, MAX_HEALTH); // 최대 체력을 넘지 않도록 함
-  };
-
-  for (let time = 0; time <= TOTAL_TIME; time++) {
-    healthRecoveryCounter++;
-
-    // 공격이 있는 경우
-    if (attackTimes[time]) {
-      healthRecoveryCounter = 0;
-      health = applyAttack(health, attackTimes[time]);
-      if (health <= 0) return -1;
-      continue;
-    }
-
-    // 체력 유지 시간이 경과한 경우
-    if (healthRecoveryCounter === maintainTime) {
-      healthRecoveryCounter = 0;
-      health = recoverHealth(health, recoveryAmount + bonusRecovery);
-      if (health <= 0) return -1;
-      continue;
-    }
-
-    // 0 이하일 경우
-    health = recoverHealth(health, recoveryAmount);
-    if (health <= 0) return -1;
-  }
-
-  return health;
+    return [score[max], score[min]];  // 최고 순위와 최저 순위 반환
 }
-
-
 ```
 
 ### 개인적인 회고와 다른 풀이
 
 (풀이 중 힘든 점이 있었다면 왜 힘들었고 어떻게 해결했는지, 아니면 이외의 좋을 것 같은 다른 풀이법이 있다면 같이 작성해주세요)
-
-for문으로 길게 작성해서 풀었지만, 반복되는 코드가 있었고 가독성이 좋지 않다고 여겨 함수로 분할해서 정리했습니다.
-
 
 ### 느낀 점
 
