@@ -1,76 +1,54 @@
 ## 1
 
-### 문제 - <code>숫자짝궁</code>
+### 문제 - <code>타겟넘버</code>
 
 ### 알고리즘 설계
 
 (왜 이렇게 코드를 작성했는지 이유를 적어주세요)
 
-1. X, Y를 스플릿 한 후 오름 차순으로 정렬합니다(중간 계산할 때 편해서 이렇게 처리했습니다)
-2. 빈도수를 계산하기 위한 함수를 구현했습니다
-3. X,Y 안의 숫자들이 반복된 값을 객체로 저장합니다
-   3.1 ex- X [1,1,1,2,2] => { '1':3, '2':2}
-4. X를 기준으로 키값만 저장된 배열을 추출합니다 => keys
-5. keys를 기준으로 X,Y 빈도수가 저장된 객체를 비교합니다
-5.1. const A = frequencyCalc(X)[keyToCompare];
-     const B = frequencyCalc(Y)[keyToCompare];
-     A,B 두 객체에 같은 키값의 밸류가 겹치면 빈도수를 비교해 더 적은 빈도수를 result 배열에 푸시합니다
-6. result 배열을 내림차순으로 정렬하고 조인합니다
-7. 0만 있는지, 안겹치는지에 따라 분류하고 리턴합니다.
+1. dfs 함수는 재귀적으로 모든 가능한 조합을 탐색
+
+index: 현재 처리 중인 숫자의 인덱스
+sum: 현재까지의 합계
+
+2. 기저 조건: index가 numbers.length와 같아지면 모든 숫자를 처리한 것
+
+이때 sum이 target과 같으면 유효한 조합을 찾은 것이므로 count를 증가
+
+3. 재귀 단계:
+
+현재 숫자를 더하는 경우와 빼는 경우 두 가지에 대해 재귀 호출
+
+마지막으로 count를 반환하여 목표 값에 도달하는 방법의 수 리턴
 
 ### 풀이 코드
 
 ```
 jsx
-function solution(X, Y) {
-    X = X.split("").sort((a,b)=>a-b);
-    Y = Y.split("").sort((a,b)=>a-b);
-   let result = [];
+function solution(numbers, target) {
+    let count = 0;
 
-    //빈도수 계산하는 함수
-   const frequencyCalc = (arr) => {
-       const frequency = {};
-       for(let i = 0; i < arr.length; i++){
-           const char = arr[i];
-          if (frequency[char]) {
-                frequency[char]++;
-            } else {
-                frequency[char] = 1;
+    function dfs(index, sum) {
+        if (index === numbers.length) {
+            if (sum === target) {
+                count++;
             }
-       }
-       return frequency;
-   }
-    frequencyCalc(X);
-    frequencyCalc(Y);
-
-    //키값만 가지고 있는 배열
-    const keys = Object.keys(frequencyCalc(X));
-    for(let i = 0 ; i < keys.length; i++){
-        const keyToCompare = keys[i];
-        const A = frequencyCalc(X)[keyToCompare];
-        const B = frequencyCalc(Y)[keyToCompare];
-        if(A && B){
-             let min = Math.min(A , B);
-                while(min--){
-                    result.push(keyToCompare);
-                }
+            return;
         }
+
+        dfs(index + 1, sum + numbers[index]);
+        dfs(index + 1, sum - numbers[index]);
     }
-    result = result.sort((a,b)=>b-a).join("");
-    if(result[0] === '0') return result[0];
-    return result.length === 0 ?  "-1" :  result;
 
+    dfs(0, 0);
+    return count;
 }
-
-
 
 ```
 
 ### 개인적인 회고와 다른 풀이
 
 (풀이 중 힘든 점이 있었다면 왜 힘들었고 어떻게 해결했는지, 아니면 이외의 좋을 것 같은 다른 풀이법이 있다면 같이 작성해주세요)
-
-최대 배열의 길이가 300만이었기 떄문에 이중 반복문을 사용할 경우 반드시 시간초과가 날 것이라고 생각해서 다른 방안을 찾던 중 빈도수로 비교하면 될 것 같아 이 방식으로 접근했습니다.
 
 ### 느낀 점
 
@@ -78,35 +56,46 @@ function solution(X, Y) {
 
 ## 2
 
-### 문제 - <code>햄버거만들기</code>
+### 문제 - <code>게임맵최단거리</code>
 
 ### 알고리즘 설계
-
-1. ingredient를 순회하며 1231순서를 충족했는지 검사합니다
-2. 충족하면 result++ 하고 index를 -3합니다.
-
 
 ### 풀이 코드
 
 ```
 jsx
-function solution(ingredient) {
-  let result = 0;
-  let i = 0;
-  while (i < ingredient.length) {
-    if (
-      ingredient[i - 3] === 1 &&
-      ingredient[i - 2] === 2 &&
-      ingredient[i - 1] === 3 &&
-      ingredient[i] === 1
-    ) {
-      result++;
-      ingredient.splice(i - 3, 4);
-      i = i - 3;
+function solution(maps) {
+    const n = maps.length;
+    const m = maps[0].length;
+    const dx = [-1, 1, 0, 0];
+    const dy = [0, 0, -1, 1];
+
+    function bfs() {
+        const queue = [[0, 0, 1]];  // [x, y, distance]
+        maps[0][0] = 0;  // 방문 표시
+
+        while (queue.length > 0) {
+            const [x, y, dist] = queue.shift();
+
+            if (x === n - 1 && y === m - 1) {
+                return dist;  // 도착점에 도달
+            }
+
+            for (let i = 0; i < 4; i++) {
+                const nx = x + dx[i];
+                const ny = y + dy[i];
+
+                if (nx >= 0 && nx < n && ny >= 0 && ny < m && maps[nx][ny] === 1) {
+                    queue.push([nx, ny, dist + 1]);
+                    maps[nx][ny] = 0;  // 방문 표시
+                }
+            }
+        }
+
+        return -1;  // 도착점에 도달할 수 없는 경우
     }
-    i++;
-  }
-  return result;
+
+    return bfs();
 }
 
 ```
@@ -114,7 +103,6 @@ function solution(ingredient) {
 ### 개인적인 회고와 다른 풀이
 
 (풀이 중 힘든 점이 있었다면 왜 힘들었고 어떻게 해결했는지, 아니면 이외의 좋을 것 같은 다른 풀이법이 있다면 같이 작성해주세요)
-
 
 ### 느낀 점
 
@@ -122,56 +110,89 @@ function solution(ingredient) {
 
 ## 3
 
-### 문제 - <code>의상</code>
+### 문제 - <code>더맵게</code>
 
 ### 알고리즘 설계
 
 (왜 이렇게 코드를 작성했는지 이유를 적어주세요)
 
-1. 의상 종류 추출:
-
-입력으로 받은 clothes 배열에서 의상의 종류만을 추출합니다.
-각 의상 항목의 두 번째 요소(인덱스 1)가 의상의 종류를 나타냅니다.
-
-2. 의상 종류별 빈도 계산:
-
-추출한 의상 종류 배열을 순회하면서 각 종류가 몇 번 등장하는지 계산합니다.
-이 정보를 객체 형태로 저장합니다. 키는 의상 종류, 값은 해당 종류의 의상 개수입니다.
-
-3. 의상 종류별 개수 배열 생성:
-
-빈도를 계산한 객체에서 값(의상 개수)만 추출하여 새로운 배열을 만듭니다.
-이 배열은 각 의상 종류별 의상의 개수를 나타냅니다.
-
-4. 조합 수 계산:
-
-의상 종류별 개수 배열을 이용하여 가능한 모든 조합의 수를 계산합니다.
-각 의상 종류별로 (해당 종류의 의상 개수 + 1)을 모두 곱합니다.
-'+1'을 하는 이유는 해당 종류의 의상을 입지 않는 경우도 하나의 선택으로 포함하기 위함입니다.
-
-5. 계산된 전체 조합의 수에서 1을 뺍니다.
-1을 빼는 이유는 모든 종류의 의상을 입지 않는 경우(알몸)를 제외하기 위함입니다.
-
 ### 풀이 코드
 
 ```
 jsx
-function solution(clothes) {
-  let arr = [];
-  for (let i = 0; i < clothes.length; i++) {
-    arr.push(clothes[i][1]);
-  }
-  
-  const frequency = arr.reduce((accu, curr) => {
-    accu[curr] = (accu[curr] || 0) + 1;
-    return accu;
-  }, {});
- 
-  const repeatedCounts = Object.values(frequency).filter((count) => count > 0);
-  const ans = repeatedCounts.reduce((a, e) => {
-    return a * (e + 1);
-  }, 1);
-  return ans - 1;
+class MinHeap {
+    constructor() {
+        this.heap = [];
+    }
+
+    push(value) {
+        this.heap.push(value);
+        this.bubbleUp();
+    }
+
+    pop() {
+        if (this.isEmpty()) return null;
+        if (this.heap.length === 1) return this.heap.pop();
+
+        const min = this.heap[0];
+        this.heap[0] = this.heap.pop();
+        this.bubbleDown();
+        return min;
+    }
+
+    isEmpty() {
+        return this.heap.length === 0;
+    }
+
+    bubbleUp() {
+        let index = this.heap.length - 1;
+        while (index > 0) {
+            const parentIndex = Math.floor((index - 1) / 2);
+            if (this.heap[parentIndex] <= this.heap[index]) break;
+            [this.heap[parentIndex], this.heap[index]] = [this.heap[index], this.heap[parentIndex]];
+            index = parentIndex;
+        }
+    }
+
+    bubbleDown() {
+        let index = 0;
+        while (true) {
+            const leftChild = 2 * index + 1;
+            const rightChild = 2 * index + 2;
+            let smallest = index;
+
+            if (leftChild < this.heap.length && this.heap[leftChild] < this.heap[smallest]) {
+                smallest = leftChild;
+            }
+
+            if (rightChild < this.heap.length && this.heap[rightChild] < this.heap[smallest]) {
+                smallest = rightChild;
+            }
+
+            if (smallest === index) break;
+
+            [this.heap[index], this.heap[smallest]] = [this.heap[smallest], this.heap[index]];
+            index = smallest;
+        }
+    }
+}
+
+function solution(scoville, K) {
+    const minHeap = new MinHeap();
+    for (const scov of scoville) {
+        minHeap.push(scov);
+    }
+
+    let mixCount = 0;
+    while (minHeap.heap[0] < K && minHeap.heap.length > 1) {
+        const first = minHeap.pop();
+        const second = minHeap.pop();
+        const newScov = first + (second * 2);
+        minHeap.push(newScov);
+        mixCount++;
+    }
+
+    return minHeap.heap[0] >= K ? mixCount : -1;
 }
 
 ```
@@ -184,3 +205,85 @@ function solution(clothes) {
 
 (풀면서 느낀점 이외에도 기억할 점이나 같이 논의하고 싶은 부분 등이 있다면 자유롭게 적어주세요)
 
+## 4
+
+### 문제 - <code>카펫</code>
+
+### 알고리즘 설계
+
+(왜 이렇게 코드를 작성했는지 이유를 적어주세요)
+
+### 풀이 코드
+
+```
+jsx
+function solution(brown, yellow) {
+    let sum = brown + yellow;
+    let y = 0;
+    let ans = [];
+    for(let i = 3; i < sum; i++){
+        y = sum / i;
+        if((i-2) * (y-2) === yellow){
+            ans.push(y);
+            ans.push(i);
+            return ans;
+        }
+    }
+}
+
+```
+
+### 개인적인 회고와 다른 풀이
+
+(풀이 중 힘든 점이 있었다면 왜 힘들었고 어떻게 해결했는지, 아니면 이외의 좋을 것 같은 다른 풀이법이 있다면 같이 작성해주세요)
+
+### 느낀 점
+
+(풀면서 느낀점 이외에도 기억할 점이나 같이 논의하고 싶은 부분 등이 있다면 자유롭게 적어주세요)
+
+## 5
+
+### 문제 - <code>다리를지나는트럭</code>
+
+### 알고리즘 설계
+
+(왜 이렇게 코드를 작성했는지 이유를 적어주세요)
+
+### 풀이 코드
+
+```
+jsx
+function solution(bridge_length, weight, truck_weights) {
+    let time = 0;
+    let bridge = Array(bridge_length).fill(0);
+    let bridge_sum = 0;
+
+    while (truck_weights.length > 0 || bridge_sum > 0) {
+        // 시간 증가
+        time++;
+
+        // 다리에서 나가는 트럭 처리
+        bridge_sum -= bridge.shift();
+
+        // 새 트럭이 다리에 올라갈 수 있는지 확인
+        if (truck_weights.length > 0 && bridge_sum + truck_weights[0] <= weight) {
+            let truck = truck_weights.shift();
+            bridge.push(truck);
+            bridge_sum += truck;
+        } else {
+            bridge.push(0);
+        }
+    }
+
+    return time;
+}
+
+```
+
+### 개인적인 회고와 다른 풀이
+
+(풀이 중 힘든 점이 있었다면 왜 힘들었고 어떻게 해결했는지, 아니면 이외의 좋을 것 같은 다른 풀이법이 있다면 같이 작성해주세요)
+
+### 느낀 점
+
+(풀면서 느낀점 이외에도 기억할 점이나 같이 논의하고 싶은 부분 등이 있다면 자유롭게 적어주세요)
