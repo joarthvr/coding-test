@@ -1,47 +1,38 @@
 ## 1
 
-### 문제 - <code>타겟넘버</code>
+### 문제 - <code>동영상 재생기</code>
 
 ### 알고리즘 설계
 
 (왜 이렇게 코드를 작성했는지 이유를 적어주세요)
-
-1. dfs 함수는 재귀적으로 모든 가능한 조합을 탐색
-
-index: 현재 처리 중인 숫자의 인덱스
-sum: 현재까지의 합계
-
-2. 기저 조건: index가 numbers.length와 같아지면 모든 숫자를 처리한 것
-
-이때 sum이 target과 같으면 유효한 조합을 찾은 것이므로 count를 증가
-
-3. 재귀 단계:
-
-현재 숫자를 더하는 경우와 빼는 경우 두 가지에 대해 재귀 호출
-
-마지막으로 count를 반환하여 목표 값에 도달하는 방법의 수 리턴
+1. 각 주어진 인자들을 초 단위로 바꿉니다
+2. 조건에 맞게 계산합니다.
 
 ### 풀이 코드
 
-```
-jsx
-function solution(numbers, target) {
-    let count = 0;
+```jsx
+function solution(video_len, pos, op_start, op_end, commands) {
+  const toSeconds = time => time.split(':').reduce((m, s) => m * 60 + +s, 0);
+  const toTimeString = seconds => [Math.floor(seconds / 60), seconds % 60]
+    .map(n => n.toString().padStart(2, '0')).join(':');
 
-    function dfs(index, sum) {
-        if (index === numbers.length) {
-            if (sum === target) {
-                count++;
-            }
-            return;
-        }
+  const vidLenSec = toSeconds(video_len);
+  const opStartSec = toSeconds(op_start);
+  const opEndSec = toSeconds(op_end);
+  let curPosSec = toSeconds(pos);
 
-        dfs(index + 1, sum + numbers[index]);
-        dfs(index + 1, sum - numbers[index]);
-    }
+  const movePosition = (pos, delta) => Math.max(0, Math.min(vidLenSec, pos + delta));
+  const skipOpening = pos => (opStartSec <= pos && pos <= opEndSec) ? opEndSec : pos;
 
-    dfs(0, 0);
-    return count;
+  for (const cmd of commands) {
+    curPosSec = skipOpening(curPosSec);
+    curPosSec = cmd === "prev" ? movePosition(curPosSec, -10) : 
+                 cmd === "next" ? movePosition(curPosSec, 10) : 
+                 curPosSec;
+    curPosSec = skipOpening(curPosSec);
+  }
+
+  return toTimeString(curPosSec);
 }
 
 ```
@@ -49,6 +40,9 @@ function solution(numbers, target) {
 ### 개인적인 회고와 다른 풀이
 
 (풀이 중 힘든 점이 있었다면 왜 힘들었고 어떻게 해결했는지, 아니면 이외의 좋을 것 같은 다른 풀이법이 있다면 같이 작성해주세요)
+
+초단위로 바꾸면 되는 건데 이거를 구현을 하려다 보니 낯설고 어려웠습니다. 
+코딩테스트를 좀 소홀히 하다보니 코손실이 많이 온 거 같습니다..
 
 ### 느낀 점
 
@@ -64,45 +58,14 @@ function solution(numbers, target) {
 
 ```
 jsx
-function solution(maps) {
-    const n = maps.length;
-    const m = maps[0].length;
-    const dx = [-1, 1, 0, 0];
-    const dy = [0, 0, -1, 1];
-
-    function bfs() {
-        const queue = [[0, 0, 1]];  // [x, y, distance]
-        maps[0][0] = 0;  // 방문 표시
-
-        while (queue.length > 0) {
-            const [x, y, dist] = queue.shift();
-
-            if (x === n - 1 && y === m - 1) {
-                return dist;  // 도착점에 도달
-            }
-
-            for (let i = 0; i < 4; i++) {
-                const nx = x + dx[i];
-                const ny = y + dy[i];
-
-                if (nx >= 0 && nx < n && ny >= 0 && ny < m && maps[nx][ny] === 1) {
-                    queue.push([nx, ny, dist + 1]);
-                    maps[nx][ny] = 0;  // 방문 표시
-                }
-            }
-        }
-
-        return -1;  // 도착점에 도달할 수 없는 경우
-    }
-
-    return bfs();
-}
+// 풀다가 실패했습니다... ㅠㅠㅠ
 
 ```
 
 ### 개인적인 회고와 다른 풀이
 
 (풀이 중 힘든 점이 있었다면 왜 힘들었고 어떻게 해결했는지, 아니면 이외의 좋을 것 같은 다른 풀이법이 있다면 같이 작성해주세요)
+다른 분들 코드 보면서 분석해봐야 할 거 같습니다 저한테는 뭔가 어려운 문제였습니다.
 
 ### 느낀 점
 
@@ -116,83 +79,34 @@ function solution(maps) {
 
 (왜 이렇게 코드를 작성했는지 이유를 적어주세요)
 
+dfs(dx, dy): 깊이 우선 탐색을 수행하는 재귀 함수입니다.
+경계 조건 체크: 지도 범위를 벗어나거나 'X'인 경우 0을 반환합니다.
+현재 위치의 값을 가져오고, 해당 위치를 'X'로 표시하여 방문했음을 나타냅니다.
+상하좌우 네 방향으로 재귀적으로 DFS를 수행하고 그 결과를 합산합니다.
+2중 for 루프로 지도의 모든 위치를 순회합니다.
+'X'가 아닌 위치에서 DFS를 시작하고, 그 결과를 result 배열에 추가합니다.
+
 ### 풀이 코드
 
-```
-jsx
-class MinHeap {
-    constructor() {
-        this.heap = [];
+```jsx
+function solution(maps) {
+    const result = []
+    maps = maps.map((m) => m.split(""))
+    const rows = maps.length;
+    const cols = maps[0].length;
+    const dfs = (dx, dy) => {
+        if (dx < 0 || dy < 0 || dx >= maps.length || dy >= maps[0].length || maps[dx][dy] === "X") return 0
+        const now = parseInt(maps[dx][dy])
+        maps[dx][dy] = "X"
+        return now + dfs(dx - 1, dy) + dfs(dx + 1, dy) + dfs(dx, dy - 1) + dfs(dx, dy + 1)
     }
-
-    push(value) {
-        this.heap.push(value);
-        this.bubbleUp();
-    }
-
-    pop() {
-        if (this.isEmpty()) return null;
-        if (this.heap.length === 1) return this.heap.pop();
-
-        const min = this.heap[0];
-        this.heap[0] = this.heap.pop();
-        this.bubbleDown();
-        return min;
-    }
-
-    isEmpty() {
-        return this.heap.length === 0;
-    }
-
-    bubbleUp() {
-        let index = this.heap.length - 1;
-        while (index > 0) {
-            const parentIndex = Math.floor((index - 1) / 2);
-            if (this.heap[parentIndex] <= this.heap[index]) break;
-            [this.heap[parentIndex], this.heap[index]] = [this.heap[index], this.heap[parentIndex]];
-            index = parentIndex;
+    
+    for (let x = 0; x < rows; x += 1) {
+        for (let y = 0; y < cols; y += 1) {
+            if (maps[x][y] !== "X") result.push(dfs(x, y))
         }
     }
-
-    bubbleDown() {
-        let index = 0;
-        while (true) {
-            const leftChild = 2 * index + 1;
-            const rightChild = 2 * index + 2;
-            let smallest = index;
-
-            if (leftChild < this.heap.length && this.heap[leftChild] < this.heap[smallest]) {
-                smallest = leftChild;
-            }
-
-            if (rightChild < this.heap.length && this.heap[rightChild] < this.heap[smallest]) {
-                smallest = rightChild;
-            }
-
-            if (smallest === index) break;
-
-            [this.heap[index], this.heap[smallest]] = [this.heap[smallest], this.heap[index]];
-            index = smallest;
-        }
-    }
-}
-
-function solution(scoville, K) {
-    const minHeap = new MinHeap();
-    for (const scov of scoville) {
-        minHeap.push(scov);
-    }
-
-    let mixCount = 0;
-    while (minHeap.heap[0] < K && minHeap.heap.length > 1) {
-        const first = minHeap.pop();
-        const second = minHeap.pop();
-        const newScov = first + (second * 2);
-        minHeap.push(newScov);
-        mixCount++;
-    }
-
-    return minHeap.heap[0] >= K ? mixCount : -1;
+    return result.length ? result.sort((a, b) => a - b) : [-1]
 }
 
 ```
@@ -200,89 +114,7 @@ function solution(scoville, K) {
 ### 개인적인 회고와 다른 풀이
 
 (풀이 중 힘든 점이 있었다면 왜 힘들었고 어떻게 해결했는지, 아니면 이외의 좋을 것 같은 다른 풀이법이 있다면 같이 작성해주세요)
-
-### 느낀 점
-
-(풀면서 느낀점 이외에도 기억할 점이나 같이 논의하고 싶은 부분 등이 있다면 자유롭게 적어주세요)
-
-## 4
-
-### 문제 - <code>카펫</code>
-
-### 알고리즘 설계
-
-(왜 이렇게 코드를 작성했는지 이유를 적어주세요)
-
-### 풀이 코드
-
-```
-jsx
-function solution(brown, yellow) {
-    let sum = brown + yellow;
-    let y = 0;
-    let ans = [];
-    for(let i = 3; i < sum; i++){
-        y = sum / i;
-        if((i-2) * (y-2) === yellow){
-            ans.push(y);
-            ans.push(i);
-            return ans;
-        }
-    }
-}
-
-```
-
-### 개인적인 회고와 다른 풀이
-
-(풀이 중 힘든 점이 있었다면 왜 힘들었고 어떻게 해결했는지, 아니면 이외의 좋을 것 같은 다른 풀이법이 있다면 같이 작성해주세요)
-
-### 느낀 점
-
-(풀면서 느낀점 이외에도 기억할 점이나 같이 논의하고 싶은 부분 등이 있다면 자유롭게 적어주세요)
-
-## 5
-
-### 문제 - <code>다리를지나는트럭</code>
-
-### 알고리즘 설계
-
-(왜 이렇게 코드를 작성했는지 이유를 적어주세요)
-
-### 풀이 코드
-
-```
-jsx
-function solution(bridge_length, weight, truck_weights) {
-    let time = 0;
-    let bridge = Array(bridge_length).fill(0);
-    let bridge_sum = 0;
-
-    while (truck_weights.length > 0 || bridge_sum > 0) {
-        // 시간 증가
-        time++;
-
-        // 다리에서 나가는 트럭 처리
-        bridge_sum -= bridge.shift();
-
-        // 새 트럭이 다리에 올라갈 수 있는지 확인
-        if (truck_weights.length > 0 && bridge_sum + truck_weights[0] <= weight) {
-            let truck = truck_weights.shift();
-            bridge.push(truck);
-            bridge_sum += truck;
-        } else {
-            bridge.push(0);
-        }
-    }
-
-    return time;
-}
-
-```
-
-### 개인적인 회고와 다른 풀이
-
-(풀이 중 힘든 점이 있었다면 왜 힘들었고 어떻게 해결했는지, 아니면 이외의 좋을 것 같은 다른 풀이법이 있다면 같이 작성해주세요)
+재귀로 도움 받아서 해봤는데 익숙만해지면 구현이 훨씬 편해지는 거 같습니다.
 
 ### 느낀 점
 
